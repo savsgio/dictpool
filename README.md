@@ -13,9 +13,9 @@ Benchmark_DictMap-4             10000000               144 ns/op               0
 ```go
 d := AcquireDict()
 
-d.Set(foo, "Hello DictPool")
+d.Set("foo", "Hello DictPool")
 
-fmt.Println(d.Get(foo))  // Output: Hello DictPool
+fmt.Println(d.Get("foo"))  // Output: Hello DictPool
 
 ReleaseDict(d)
 ```

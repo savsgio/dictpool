@@ -49,6 +49,10 @@ func (d *Dict) allocKV() *KV {
 	return &d.data[n]
 }
 
+func (d *Dict) swap(i, j int) {
+	d.data[i], d.data[j] = d.data[j], d.data[i]
+}
+
 func (d *Dict) appendArgs(key string, value interface{}) {
 	kv := d.allocKV()
 
@@ -76,6 +80,20 @@ func (d *Dict) setArgs(key string, value interface{}) {
 	}
 
 	d.appendArgs(key, value)
+}
+
+func (d *Dict) delArgs(key string) {
+	for i, n := 0, len(d.data); i < n; i++ {
+		kv := &d.data[i]
+		if key == string(kv.key) {
+			n--
+			if i != n {
+				d.swap(i, n)
+				i--
+			}
+			d.data = d.data[:n] // Remove last position
+		}
+	}
 }
 
 // Get get data from key
@@ -106,4 +124,14 @@ func (d *Dict) Set(key string, value interface{}) {
 // SetBytes set new key
 func (d *Dict) SetBytes(key []byte, value interface{}) {
 	d.setArgs(string(key), value)
+}
+
+// Del delete key
+func (d *Dict) Del(key string) {
+	d.delArgs(key)
+}
+
+// DelBytes delete key
+func (d *Dict) DelBytes(key []byte) {
+	d.delArgs(string(key))
 }

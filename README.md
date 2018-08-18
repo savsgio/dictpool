@@ -1,6 +1,8 @@
 dictpool
 ========
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/savsgio/dictpool)](https://goreportcard.com/report/github.com/savsgio/dictpool)
+
 Dictionary (Python like) with better performance than the `map[key]value`
 
 ```

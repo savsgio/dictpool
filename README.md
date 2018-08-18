@@ -13,7 +13,7 @@ Benchmark_DictMap-4             10000000               144 ns/op               0
 
 ## Example:
 ```go
-d := AcquireDict()
+d := dictpool.AcquireDict()
 key := "foo"
 
 d.Set(key, "Hello DictPool")
@@ -24,5 +24,5 @@ if d.Has(key){
 
 d.Del(key)
 
-ReleaseDict(d)
+dictpool.ReleaseDict(d)
 ```

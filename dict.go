@@ -6,8 +6,8 @@ import (
 
 // KV struct so it storages key/value data
 type KV struct {
-	key   []byte
-	value interface{}
+	Key   []byte
+	Value interface{}
 }
 
 // Dict struct for imitate map[key]value
@@ -53,8 +53,8 @@ func (d *Dict) allocKV() *KV {
 func (d *Dict) appendArgs(key string, value interface{}) {
 	kv := d.allocKV()
 
-	kv.key = append(kv.key[:0], key...)
-	kv.value = value
+	kv.Key = append(kv.Key[:0], key...)
+	kv.Value = value
 }
 
 func (d *Dict) swap(i, j int) {
@@ -65,7 +65,7 @@ func (d *Dict) getArgs(key string) *KV {
 	n := len(d.D)
 	for i := 0; i < n; i++ {
 		kv := &d.D[i]
-		if key == string(kv.key) {
+		if key == string(kv.Key) {
 			return kv
 		}
 	}
@@ -76,7 +76,7 @@ func (d *Dict) getArgs(key string) *KV {
 func (d *Dict) setArgs(key string, value interface{}) {
 	kv := d.getArgs(key)
 	if kv != nil {
-		kv.value = value
+		kv.Value = value
 		return
 	}
 
@@ -86,7 +86,7 @@ func (d *Dict) setArgs(key string, value interface{}) {
 func (d *Dict) delArgs(key string) {
 	for i, n := 0, len(d.D); i < n; i++ {
 		kv := &d.D[i]
-		if key == string(kv.key) {
+		if key == string(kv.Key) {
 			n--
 			if i != n {
 				d.swap(i, n)
@@ -100,7 +100,7 @@ func (d *Dict) delArgs(key string) {
 func (d *Dict) hasArgs(key string) bool {
 	for i, n := 0, len(d.D); i < n; i++ {
 		kv := &d.D[i]
-		if key == string(kv.key) {
+		if key == string(kv.Key) {
 			return true
 		}
 	}
@@ -112,7 +112,7 @@ func (d *Dict) hasArgs(key string) bool {
 func (d *Dict) Get(key string) interface{} {
 	kv := d.getArgs(key)
 	if kv != nil {
-		return kv.value
+		return kv.Value
 	}
 
 	return nil
@@ -122,7 +122,7 @@ func (d *Dict) Get(key string) interface{} {
 func (d *Dict) GetBytes(key []byte) interface{} {
 	kv := d.getArgs(string(key))
 	if kv != nil {
-		return kv.value
+		return kv.Value
 	}
 
 	return nil

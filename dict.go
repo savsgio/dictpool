@@ -12,7 +12,8 @@ type KV struct {
 
 // Dict struct for imitate map[key]value
 type Dict struct {
-	data []KV
+	// D slice of KV for storage the data
+	D []KV
 }
 
 var defaultPool = sync.Pool{
@@ -34,19 +35,19 @@ func ReleaseDict(d *Dict) {
 
 // Reset reset dict
 func (d *Dict) Reset() {
-	d.data = d.data[:0]
+	d.D = d.D[:0]
 }
 
 func (d *Dict) allocKV() *KV {
-	n := len(d.data)
+	n := len(d.D)
 
-	if cap(d.data) > n {
-		d.data = d.data[:n+1]
+	if cap(d.D) > n {
+		d.D = d.D[:n+1]
 	} else {
-		d.data = append(d.data, KV{})
+		d.D = append(d.D, KV{})
 	}
 
-	return &d.data[n]
+	return &d.D[n]
 }
 
 func (d *Dict) appendArgs(key string, value interface{}) {
@@ -57,13 +58,13 @@ func (d *Dict) appendArgs(key string, value interface{}) {
 }
 
 func (d *Dict) swap(i, j int) {
-	d.data[i], d.data[j] = d.data[j], d.data[i]
+	d.D[i], d.D[j] = d.D[j], d.D[i]
 }
 
 func (d *Dict) getArgs(key string) *KV {
-	n := len(d.data)
+	n := len(d.D)
 	for i := 0; i < n; i++ {
-		kv := &d.data[i]
+		kv := &d.D[i]
 		if key == string(kv.key) {
 			return kv
 		}
@@ -83,22 +84,22 @@ func (d *Dict) setArgs(key string, value interface{}) {
 }
 
 func (d *Dict) delArgs(key string) {
-	for i, n := 0, len(d.data); i < n; i++ {
-		kv := &d.data[i]
+	for i, n := 0, len(d.D); i < n; i++ {
+		kv := &d.D[i]
 		if key == string(kv.key) {
 			n--
 			if i != n {
 				d.swap(i, n)
 				i--
 			}
-			d.data = d.data[:n] // Remove last position
+			d.D = d.D[:n] // Remove last position
 		}
 	}
 }
 
 func (d *Dict) hasArgs(key string) bool {
-	for i, n := 0, len(d.data); i < n; i++ {
-		kv := &d.data[i]
+	for i, n := 0, len(d.D); i < n; i++ {
+		kv := &d.D[i]
 		if key == string(kv.key) {
 			return true
 		}
@@ -148,11 +149,11 @@ func (d *Dict) DelBytes(key []byte) {
 }
 
 // Has check if key exists
-func (d *Dict) Has(key string) {
-	d.hasArgs(key)
+func (d *Dict) Has(key string) bool {
+	return d.hasArgs(key)
 }
 
 // HasBytes check if key exists
-func (d *Dict) HasBytes(key []byte) {
-	d.hasArgs(string(key))
+func (d *Dict) HasBytes(key []byte) bool {
+	return d.hasArgs(string(key))
 }

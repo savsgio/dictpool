@@ -1,6 +1,7 @@
 package dictpool
 
 import (
+	"encoding/json"
 	"sync"
 )
 
@@ -10,11 +11,16 @@ type KV struct {
 	Value interface{}
 }
 
-// Dict struct for imitate map[key]value
+// Dict dictionary as slice with better performance
 type Dict struct {
 	// D slice of KV for storage the data
 	D []KV
+
+	dictMapBuff DictMap
 }
+
+// DictMap dictionary as map
+type DictMap map[string]interface{}
 
 var defaultPool = sync.Pool{
 	New: func() interface{} {
@@ -156,4 +162,55 @@ func (d *Dict) Has(key string) bool {
 // HasBytes check if key exists
 func (d *Dict) HasBytes(key []byte) bool {
 	return d.hasArgs(string(key))
+}
+
+// Map convert to map
+func (d *Dict) Map() DictMap {
+	data := make(DictMap)
+
+	for _, kv := range d.D {
+		switch kv.Value.(type) {
+		case *Dict:
+			data[string(kv.Key)] = kv.Value.(*Dict).Map()
+		default:
+			data[string(kv.Key)] = kv.Value
+		}
+	}
+
+	return data
+}
+
+// Marshal returns the JSON encoding of Dict.
+func (d *Dict) Marshal() ([]byte, error) {
+	return json.Marshal(d.Map())
+}
+
+func (d *Dict) dictKV(data DictMap) {
+	for k, v := range data {
+		switch v.(type) {
+		case map[string]interface{}:
+			subDict := AcquireDict()
+			subDict.dictKV(v.(map[string]interface{}))
+
+			d.Set(k, subDict)
+		default:
+			d.Set(k, v)
+		}
+	}
+}
+
+// Unmarshal parses the JSON-encoded data and stores the result in Dict.
+func (d *Dict) Unmarshal(data []byte) error {
+	d.dictMapBuff = make(DictMap)
+
+	err := json.Unmarshal(data, &d.dictMapBuff)
+	if err != nil {
+		return err
+	}
+
+	d.dictKV(d.dictMapBuff)
+
+	d.dictMapBuff = nil
+
+	return nil
 }

@@ -5,29 +5,7 @@ import (
 	"testing"
 )
 
-func Benchmark_DictPoolSet(b *testing.B) {
-	foo := "DictPool"
-
-	b.ResetTimer()
-	for i := 0; i <= b.N; i++ {
-		d := AcquireDict()
-		d.Set(foo, 99)
-		ReleaseDict(d)
-	}
-}
-
-func Benchmark_DictPooltSetBytes(b *testing.B) {
-	foo := []byte("DictPool")
-
-	b.ResetTimer()
-	for i := 0; i <= b.N; i++ {
-		d := AcquireDict()
-		d.SetBytes(foo, 99)
-		ReleaseDict(d)
-	}
-}
-
-func Benchmark_DictPoolGet(b *testing.B) {
+func Benchmark_DictPool(b *testing.B) {
 	foo := "DictPool"
 
 	b.ResetTimer()
@@ -39,7 +17,7 @@ func Benchmark_DictPoolGet(b *testing.B) {
 	}
 }
 
-func Benchmark_DictPoolGetBytes(b *testing.B) {
+func Benchmark_DictPoolBytes(b *testing.B) {
 	foo := []byte("DictPool")
 
 	b.ResetTimer()
@@ -51,37 +29,7 @@ func Benchmark_DictPoolGetBytes(b *testing.B) {
 	}
 }
 
-func Benchmark_DictMapSet(b *testing.B) {
-	type dictKV struct {
-		data map[string]interface{}
-	}
-
-	pool := sync.Pool{
-		New: func() interface{} {
-			return dictKV{
-				data: make(map[string]interface{}),
-			}
-		},
-	}
-
-	key := "DictPool"
-
-	b.ResetTimer()
-	for i := 0; i <= b.N; i++ {
-		d := pool.Get().(dictKV)
-
-		d.data[key] = 99
-
-		// Reset
-		for k := range d.data {
-			delete(d.data, k)
-		}
-
-		pool.Put(d)
-	}
-}
-
-func Benchmark_DictMapGet(b *testing.B) {
+func Benchmark_DictMap(b *testing.B) {
 	type dictKV struct {
 		data map[string]interface{}
 	}
@@ -113,48 +61,36 @@ func Benchmark_DictMapGet(b *testing.B) {
 	}
 }
 
-func Benchmark_Marshal(b *testing.B) {
+func Benchmark_Map(b *testing.B) {
 	d1 := AcquireDict()
-	d2 := AcquireDict()
 
 	d1.Set("Foo", "Bar")
-	d2.Set("DictPool", d1)
+	d1.Set("Foo2", "Bar2")
 
-	buff := []byte(nil)
+	m := make(DictMap)
 
 	b.ResetTimer()
 	for i := 0; i <= b.N; i++ {
-		buff, _ = d2.Marshal()
-
-		buff = buff[:0]
+		d1.Map(m)
 	}
 	b.StopTimer()
 
 	ReleaseDict(d1)
-	ReleaseDict(d2)
 }
 
-func Benchmark_Unmarshal(b *testing.B) {
-	jsonStr := []byte("{\"DictPool\":{\"Foo\":\"Bar\"}}")
+func Benchmark_Parse(b *testing.B) {
+	m := map[string]interface{}{
+		"Hola":  true,
+		"Adios": false,
+	}
+
 	d := AcquireDict()
 
 	b.ResetTimer()
 	for i := 0; i <= b.N; i++ {
-		d.Unmarshal(jsonStr)
+		d.Parse(m)
 	}
 	b.StopTimer()
 
 	ReleaseDict(d)
 }
-
-// func printDict(data *Dict) {
-// 	for _, kv := range data.D {
-// 		switch kv.Value.(type) {
-// 		case *Dict:
-// 			print(string(kv.Key) + ": ")
-// 			printDict(kv.Value.(*Dict))
-// 		default:
-// 			fmt.Println(string(kv.Key), ": ", kv.Value)
-// 		}
-// 	}
-// }

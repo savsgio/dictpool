@@ -1,7 +1,6 @@
 package dictpool
 
 import (
-	"encoding/json"
 	"sync"
 )
 
@@ -11,16 +10,14 @@ type KV struct {
 	Value interface{}
 }
 
+// DictMap dictionary as map
+type DictMap map[string]interface{}
+
 // Dict dictionary as slice with better performance
 type Dict struct {
 	// D slice of KV for storage the data
 	D []KV
-
-	dictMapBuff DictMap
 }
-
-// DictMap dictionary as map
-type DictMap map[string]interface{}
 
 var defaultPool = sync.Pool{
 	New: func() interface{} {
@@ -71,7 +68,7 @@ func (d *Dict) getArgs(key string) *KV {
 	n := len(d.D)
 	for i := 0; i < n; i++ {
 		kv := &d.D[i]
-		if key == string(kv.Key) {
+		if key == b2s(kv.Key) {
 			return kv
 		}
 	}
@@ -92,7 +89,7 @@ func (d *Dict) setArgs(key string, value interface{}) {
 func (d *Dict) delArgs(key string) {
 	for i, n := 0, len(d.D); i < n; i++ {
 		kv := &d.D[i]
-		if key == string(kv.Key) {
+		if key == b2s(kv.Key) {
 			n--
 			if i != n {
 				d.swap(i, n)
@@ -106,7 +103,7 @@ func (d *Dict) delArgs(key string) {
 func (d *Dict) hasArgs(key string) bool {
 	for i, n := 0, len(d.D); i < n; i++ {
 		kv := &d.D[i]
-		if key == string(kv.Key) {
+		if key == b2s(kv.Key) {
 			return true
 		}
 	}
@@ -126,7 +123,7 @@ func (d *Dict) Get(key string) interface{} {
 
 // GetBytes get data from key
 func (d *Dict) GetBytes(key []byte) interface{} {
-	kv := d.getArgs(string(key))
+	kv := d.getArgs(b2s(key))
 	if kv != nil {
 		return kv.Value
 	}
@@ -141,7 +138,7 @@ func (d *Dict) Set(key string, value interface{}) {
 
 // SetBytes set new key
 func (d *Dict) SetBytes(key []byte, value interface{}) {
-	d.setArgs(string(key), value)
+	d.setArgs(b2s(key), value)
 }
 
 // Del delete key
@@ -151,7 +148,7 @@ func (d *Dict) Del(key string) {
 
 // DelBytes delete key
 func (d *Dict) DelBytes(key []byte) {
-	d.delArgs(string(key))
+	d.delArgs(b2s(key))
 }
 
 // Has check if key exists
@@ -161,56 +158,34 @@ func (d *Dict) Has(key string) bool {
 
 // HasBytes check if key exists
 func (d *Dict) HasBytes(key []byte) bool {
-	return d.hasArgs(string(key))
+	return d.hasArgs(b2s(key))
 }
 
 // Map convert to map
-func (d *Dict) Map() DictMap {
-	data := make(DictMap)
-
+func (d *Dict) Map(dst DictMap) {
 	for _, kv := range d.D {
 		switch kv.Value.(type) {
 		case *Dict:
-			data[string(kv.Key)] = kv.Value.(*Dict).Map()
+			subDst := make(DictMap)
+			kv.Value.(*Dict).Map(subDst)
+			dst[b2s(kv.Key)] = subDst
 		default:
-			data[string(kv.Key)] = kv.Value
+			dst[b2s(kv.Key)] = kv.Value
 		}
 	}
-
-	return data
 }
 
-// Marshal returns the JSON encoding of Dict.
-func (d *Dict) Marshal() ([]byte, error) {
-	return json.Marshal(d.Map())
-}
-
-func (d *Dict) dictKV(data DictMap) {
-	for k, v := range data {
+// Parse convert map to Dict
+func (d *Dict) Parse(src DictMap) {
+	for k, v := range src {
 		switch v.(type) {
 		case map[string]interface{}:
-			subDict := AcquireDict()
-			subDict.dictKV(v.(map[string]interface{}))
+			subDict := new(Dict)
+			subDict.Parse(v.(map[string]interface{}))
 
 			d.Set(k, subDict)
 		default:
 			d.Set(k, v)
 		}
 	}
-}
-
-// Unmarshal parses the JSON-encoded data and stores the result in Dict.
-func (d *Dict) Unmarshal(data []byte) error {
-	d.dictMapBuff = make(DictMap)
-
-	err := json.Unmarshal(data, &d.dictMapBuff)
-	if err != nil {
-		return err
-	}
-
-	d.dictKV(d.dictMapBuff)
-
-	d.dictMapBuff = nil
-
-	return nil
 }

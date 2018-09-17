@@ -7,9 +7,9 @@ Memory store like `map[string]interface{}` with better performance.
 
 ## Benchmarks:
 ```
-Benchmark_DictPool-4            30000000                57.4 ns/op             0 B/op          0 allocs/op
-Benchmark_DictPoolBytes-4       20000000                55.8 ns/op             0 B/op          0 allocs/op
-Benchmark_DictMap-4             20000000                96.3 ns/op             0 B/op          0 allocs/op
+Benchmark_DictPool-4            20000000                56.1 ns/op             0 B/op          0 allocs/op
+Benchmark_DictPoolBytes-4       20000000                54.8 ns/op             0 B/op          0 allocs/op
+Benchmark_DictMap-4             20000000               102 ns/op               0 B/op          0 allocs/op
 ```
 
 *Benchmark with Go 1.11*

@@ -7,8 +7,8 @@ Memory store like `map[string]interface{}` with better performance.
 
 ## Benchmarks:
 ```
-Benchmark_DictPool-4            20000000                56.1 ns/op             0 B/op          0 allocs/op
-Benchmark_DictPoolBytes-4       20000000                54.8 ns/op             0 B/op          0 allocs/op
+Benchmark_DictPool-4            20000000                61.4 ns/op             0 B/op          0 allocs/op
+Benchmark_DictPoolBytes-4       20000000                59.2 ns/op             0 B/op          0 allocs/op
 Benchmark_DictMap-4             20000000               102 ns/op               0 B/op          0 allocs/op
 ```
 

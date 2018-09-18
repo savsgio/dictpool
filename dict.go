@@ -41,33 +41,37 @@ func (d *Dict) Reset() {
 	d.D = d.D[:0]
 }
 
-func (d *Dict) allocKV() *KV {
-	n := len(d.D)
+func allocKV(data []KV) ([]KV, *KV) {
+	n := len(data)
 
-	if cap(d.D) > n {
-		d.D = d.D[:n+1]
+	if cap(data) > n {
+		data = data[:n+1]
 	} else {
-		d.D = append(d.D, KV{})
+		data = append(data, KV{})
 	}
 
-	return &d.D[n]
+	return data, &data[n]
 }
 
-func (d *Dict) appendArgs(key string, value interface{}) {
-	kv := d.allocKV()
+func appendArgs(data []KV, key string, value interface{}) []KV {
+	data, kv := allocKV(data)
 
 	kv.Key = append(kv.Key[:0], key...)
 	kv.Value = value
+
+	return data
 }
 
-func (d *Dict) swap(i, j int) {
-	d.D[i], d.D[j] = d.D[j], d.D[i]
+func swap(data []KV, i, j int) []KV {
+	data[i], data[j] = data[j], data[i]
+
+	return data
 }
 
-func (d *Dict) getArgs(key string) *KV {
-	n := len(d.D)
+func getArgs(data []KV, key string) *KV {
+	n := len(data)
 	for i := 0; i < n; i++ {
-		kv := &d.D[i]
+		kv := &data[i]
 		if key == b2s(kv.Key) {
 			return kv
 		}
@@ -76,33 +80,35 @@ func (d *Dict) getArgs(key string) *KV {
 	return nil
 }
 
-func (d *Dict) setArgs(key string, value interface{}) {
-	kv := d.getArgs(key)
+func setArgs(data []KV, key string, value interface{}) []KV {
+	kv := getArgs(data, key)
 	if kv != nil {
 		kv.Value = value
-		return
+		return data
 	}
 
-	d.appendArgs(key, value)
+	return appendArgs(data, key, value)
 }
 
-func (d *Dict) delArgs(key string) {
-	for i, n := 0, len(d.D); i < n; i++ {
-		kv := &d.D[i]
+func delArgs(data []KV, key string) []KV {
+	for i, n := 0, len(data); i < n; i++ {
+		kv := &data[i]
 		if key == b2s(kv.Key) {
 			n--
 			if i != n {
-				d.swap(i, n)
+				swap(data, i, n)
 				i--
 			}
-			d.D = d.D[:n] // Remove last position
+			data = data[:n] // Remove last position
 		}
 	}
+
+	return data
 }
 
-func (d *Dict) hasArgs(key string) bool {
-	for i, n := 0, len(d.D); i < n; i++ {
-		kv := &d.D[i]
+func hasArgs(data []KV, key string) bool {
+	for i, n := 0, len(data); i < n; i++ {
+		kv := &data[i]
 		if key == b2s(kv.Key) {
 			return true
 		}
@@ -113,7 +119,7 @@ func (d *Dict) hasArgs(key string) bool {
 
 // Get get data from key
 func (d *Dict) Get(key string) interface{} {
-	kv := d.getArgs(key)
+	kv := getArgs(d.D, key)
 	if kv != nil {
 		return kv.Value
 	}
@@ -123,7 +129,7 @@ func (d *Dict) Get(key string) interface{} {
 
 // GetBytes get data from key
 func (d *Dict) GetBytes(key []byte) interface{} {
-	kv := d.getArgs(b2s(key))
+	kv := getArgs(d.D, b2s(key))
 	if kv != nil {
 		return kv.Value
 	}
@@ -133,32 +139,32 @@ func (d *Dict) GetBytes(key []byte) interface{} {
 
 // Set set new key
 func (d *Dict) Set(key string, value interface{}) {
-	d.setArgs(key, value)
+	d.D = setArgs(d.D, key, value)
 }
 
 // SetBytes set new key
 func (d *Dict) SetBytes(key []byte, value interface{}) {
-	d.setArgs(b2s(key), value)
+	d.D = setArgs(d.D, b2s(key), value)
 }
 
 // Del delete key
 func (d *Dict) Del(key string) {
-	d.delArgs(key)
+	d.D = delArgs(d.D, key)
 }
 
 // DelBytes delete key
 func (d *Dict) DelBytes(key []byte) {
-	d.delArgs(b2s(key))
+	d.D = delArgs(d.D, b2s(key))
 }
 
 // Has check if key exists
 func (d *Dict) Has(key string) bool {
-	return d.hasArgs(key)
+	return hasArgs(d.D, key)
 }
 
 // HasBytes check if key exists
 func (d *Dict) HasBytes(key []byte) bool {
-	return d.hasArgs(b2s(key))
+	return hasArgs(d.D, b2s(key))
 }
 
 // Map convert to map

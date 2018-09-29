@@ -3,7 +3,7 @@ dictpool
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/savsgio/dictpool)](https://goreportcard.com/report/github.com/savsgio/dictpool)
 
-Memory store like `map[string]interface{}` with better performance.
+Memory store like `map[string]interface{}` with better performance and safe concurrency.
 
 ## Benchmarks:
 ```

@@ -1,0 +1,7 @@
+[[constraint]]
+  branch = "master"
+  name = "github.com/tinylib/msgp"
+
+[prune]
+  go-tests = true
+  unused-packages = true

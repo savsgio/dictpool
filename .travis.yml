@@ -9,6 +9,10 @@ go:
   - 1.10.x
   - 1.11.x
 
+os:
+  - linux
+  - osx
+
 script:
     # build test for supported platforms
   - GOOS=linux go build

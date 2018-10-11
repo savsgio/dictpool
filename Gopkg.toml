@@ -4,7 +4,7 @@
 
 [[constraint]]
   branch = "master"
-  name = "github.com/savsgio/gotils.git"
+  name = "github.com/savsgio/gotils"
 
 [prune]
   go-tests = true

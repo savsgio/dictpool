@@ -21,4 +21,8 @@ script:
   - GOOS=windows go build
   - GOARCH=386 go build
 
-  - go test -v -cover -race
+  # run tests on a standard platform
+  - go test -v ./...
+
+  # run tests with the race detector as well
+  - go test -race -v ./...

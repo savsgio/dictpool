@@ -2,6 +2,10 @@
   branch = "master"
   name = "github.com/tinylib/msgp"
 
+[[constraint]]
+  branch = "master"
+  name = "github.com/savsgio/gotils.git"
+
 [prune]
   go-tests = true
   unused-packages = true

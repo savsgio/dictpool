@@ -2,6 +2,8 @@ package dictpool
 
 import (
 	"sync"
+
+	"github.com/savsgio/gotils"
 )
 
 var defaultPool = sync.Pool{
@@ -57,7 +59,7 @@ func getArgs(data []KV, key string) *KV {
 	n := len(data)
 	for i := 0; i < n; i++ {
 		kv := &data[i]
-		if key == b2s(kv.Key) {
+		if key == gotils.B2S(kv.Key) {
 			return kv
 		}
 	}
@@ -78,7 +80,7 @@ func setArgs(data []KV, key string, value interface{}) []KV {
 func delArgs(data []KV, key string) []KV {
 	for i, n := 0, len(data); i < n; i++ {
 		kv := &data[i]
-		if key == b2s(kv.Key) {
+		if key == gotils.B2S(kv.Key) {
 			n--
 			if i != n {
 				swap(data, i, n)
@@ -94,7 +96,7 @@ func delArgs(data []KV, key string) []KV {
 func hasArgs(data []KV, key string) bool {
 	for i, n := 0, len(data); i < n; i++ {
 		kv := &data[i]
-		if key == b2s(kv.Key) {
+		if key == gotils.B2S(kv.Key) {
 			return true
 		}
 	}
@@ -114,7 +116,7 @@ func (d *Dict) Get(key string) interface{} {
 
 // GetBytes get data from key
 func (d *Dict) GetBytes(key []byte) interface{} {
-	kv := getArgs(d.D, b2s(key))
+	kv := getArgs(d.D, gotils.B2S(key))
 	if kv != nil {
 		return kv.Value
 	}
@@ -129,7 +131,7 @@ func (d *Dict) Set(key string, value interface{}) {
 
 // SetBytes set new key
 func (d *Dict) SetBytes(key []byte, value interface{}) {
-	d.D = setArgs(d.D, b2s(key), value)
+	d.D = setArgs(d.D, gotils.B2S(key), value)
 }
 
 // Del delete key
@@ -139,7 +141,7 @@ func (d *Dict) Del(key string) {
 
 // DelBytes delete key
 func (d *Dict) DelBytes(key []byte) {
-	d.D = delArgs(d.D, b2s(key))
+	d.D = delArgs(d.D, gotils.B2S(key))
 }
 
 // Has check if key exists
@@ -149,7 +151,7 @@ func (d *Dict) Has(key string) bool {
 
 // HasBytes check if key exists
 func (d *Dict) HasBytes(key []byte) bool {
-	return hasArgs(d.D, b2s(key))
+	return hasArgs(d.D, gotils.B2S(key))
 }
 
 // Map convert to map
@@ -159,9 +161,9 @@ func (d *Dict) Map(dst DictMap) {
 		case *Dict:
 			subDst := make(DictMap)
 			kv.Value.(*Dict).Map(subDst)
-			dst[b2s(kv.Key)] = subDst
+			dst[gotils.B2S(kv.Key)] = subDst
 		default:
-			dst[b2s(kv.Key)] = kv.Value
+			dst[gotils.B2S(kv.Key)] = kv.Value
 		}
 	}
 }

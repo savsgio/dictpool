@@ -11,6 +11,14 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:4ca77a79777883617f47054926fa371b86c791d719df3cfd7bccd5a47ffcbaee"
+  name = "github.com/savsgio/gotils"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "94311a6bc296ec2a5c43716431032fb5b299cdc9"
+
+[[projects]]
+  branch = "master"
   digest = "1:3cb6dfe7cdece5716b1c3c3c0b5faf7fce2e83e2758e2baad2e9986d101980b8"
   name = "github.com/tinylib/msgp"
   packages = ["msgp"]
@@ -20,6 +28,9 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = ["github.com/tinylib/msgp/msgp"]
+  input-imports = [
+    "github.com/savsgio/gotils",
+    "github.com/tinylib/msgp/msgp",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1

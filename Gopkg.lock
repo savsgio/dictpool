@@ -11,11 +11,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:4ca77a79777883617f47054926fa371b86c791d719df3cfd7bccd5a47ffcbaee"
+  digest = "1:ea2079b3d6e71db0992f3d12d72587a2aea2810e7e925539ead073b6691cf3aa"
   name = "github.com/savsgio/gotils"
   packages = ["."]
   pruneopts = "UT"
-  revision = "94311a6bc296ec2a5c43716431032fb5b299cdc9"
+  revision = "3c5ca22740af22a0a38d3ec485fd4c44f7e003df"
 
 [[projects]]
   branch = "master"

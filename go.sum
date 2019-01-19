@@ -1,4 +1,6 @@
+github.com/philhofer/fwd v1.0.0 h1:UbZqGr5Y38ApvM/V/jEljVxwocdweyH+vmYvRPBnbqQ=
 github.com/philhofer/fwd v1.0.0/go.mod h1:gk3iGcWd9+svBvR0sR+KPcfE+RNWozjowpeBVG3ZVNU=
 github.com/savsgio/gotils v0.0.0-20181217102925-dc772c0d89a4 h1:NxZM/YEOq7/NjewVUB8Vx+nHsxv/zqS5n8IlUaqxSoI=
 github.com/savsgio/gotils v0.0.0-20181217102925-dc772c0d89a4/go.mod h1:w803/Fg1m0hrp1ZT9KNfQe4E4+WOMMFLcgzPvOcye10=
+github.com/tinylib/msgp v1.1.0 h1:9fQd+ICuRIu/ue4vxJZu6/LzxN0HwMds2nq/0cFvxHU=
 github.com/tinylib/msgp v1.1.0/go.mod h1:+d+yLhGm8mzTaHzB+wgMYrodPfmZrzkirds8fDWklFE=

@@ -74,7 +74,7 @@ func TestEncodeDecodeDict(t *testing.T) {
 
 	m := v.Msgsize()
 	if buf.Len() > m {
-		t.Logf("WARNING: Msgsize() for %v is inaccurate", v)
+		t.Log("WARNING: TestEncodeDecodeDict Msgsize() is inaccurate")
 	}
 
 	vn := Dict{}
@@ -187,7 +187,7 @@ func TestEncodeDecodeDictMap(t *testing.T) {
 
 	m := v.Msgsize()
 	if buf.Len() > m {
-		t.Logf("WARNING: Msgsize() for %v is inaccurate", v)
+		t.Log("WARNING: TestEncodeDecodeDictMap Msgsize() is inaccurate")
 	}
 
 	vn := DictMap{}
@@ -300,7 +300,7 @@ func TestEncodeDecodeKV(t *testing.T) {
 
 	m := v.Msgsize()
 	if buf.Len() > m {
-		t.Logf("WARNING: Msgsize() for %v is inaccurate", v)
+		t.Log("WARNING: TestEncodeDecodeKV Msgsize() is inaccurate")
 	}
 
 	vn := KV{}

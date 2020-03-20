@@ -1,6 +1,6 @@
 github.com/philhofer/fwd v1.0.0 h1:UbZqGr5Y38ApvM/V/jEljVxwocdweyH+vmYvRPBnbqQ=
 github.com/philhofer/fwd v1.0.0/go.mod h1:gk3iGcWd9+svBvR0sR+KPcfE+RNWozjowpeBVG3ZVNU=
-github.com/savsgio/gotils v0.0.0-20190925070755-524bc4f47500 h1:9Pi10H7E8E79/x2HSe1FmMGd7BJ1WAqDKzwjpv+ojFg=
-github.com/savsgio/gotils v0.0.0-20190925070755-524bc4f47500/go.mod h1:lHhJedqxCoHN+zMtwGNTXWmF0u9Jt363FYRhV6g0CdY=
-github.com/tinylib/msgp v1.1.1 h1:TnCZ3FIuKeaIy+F45+Cnp+caqdXGy4z74HvwXN+570Y=
-github.com/tinylib/msgp v1.1.1/go.mod h1:+d+yLhGm8mzTaHzB+wgMYrodPfmZrzkirds8fDWklFE=
+github.com/savsgio/gotils v0.0.0-20200319105752-a9cc718f6a3f h1:XfUnevLK4O22at3R77FlyQHKwlQs75LELdsH2wRX2KQ=
+github.com/savsgio/gotils v0.0.0-20200319105752-a9cc718f6a3f/go.mod h1:lHhJedqxCoHN+zMtwGNTXWmF0u9Jt363FYRhV6g0CdY=
+github.com/tinylib/msgp v1.1.2 h1:gWmO7n0Ys2RBEb7GPYB9Ujq8Mk5p2U08lRnmMcGy6BQ=
+github.com/tinylib/msgp v1.1.2/go.mod h1:+d+yLhGm8mzTaHzB+wgMYrodPfmZrzkirds8fDWklFE=

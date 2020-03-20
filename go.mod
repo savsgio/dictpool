@@ -4,6 +4,6 @@ go 1.13
 
 require (
 	github.com/philhofer/fwd v1.0.0 // indirect
-	github.com/savsgio/gotils v0.0.0-20190925070755-524bc4f47500
-	github.com/tinylib/msgp v1.1.1
+	github.com/savsgio/gotils v0.0.0-20200319105752-a9cc718f6a3f
+	github.com/tinylib/msgp v1.1.2
 )

@@ -3,7 +3,7 @@ language: go
 os:
   - linux
   - osx
-  # - windows
+  - windows
 
 go:
   - 1.14.x
@@ -13,7 +13,7 @@ go:
   - 1.10.x
   - tip
 
-before_install:
+before_script:
   - go get -t -v ./...
 
 script:

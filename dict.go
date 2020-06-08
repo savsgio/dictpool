@@ -12,18 +12,18 @@ var defaultPool = sync.Pool{
 	},
 }
 
-// AcquireDict acquire new dict
+// AcquireDict acquire new dict.
 func AcquireDict() *Dict {
 	return defaultPool.Get().(*Dict)
 }
 
-// ReleaseDict release dict
+// ReleaseDict release dict.
 func ReleaseDict(d *Dict) {
 	d.Reset()
 	defaultPool.Put(d)
 }
 
-// Reset reset dict
+// Reset reset dict.
 func (d *Dict) Reset() {
 	d.D = d.D[:0]
 }
@@ -86,6 +86,7 @@ func delArgs(data []KV, key string) []KV {
 				swap(data, i, n)
 				i--
 			}
+
 			data = data[:n] // Remove last position
 		}
 	}
@@ -104,7 +105,7 @@ func hasArgs(data []KV, key string) bool {
 	return false
 }
 
-// Get get data from key
+// Get get data from key.
 func (d *Dict) Get(key string) interface{} {
 	kv := getArgs(d.D, key)
 	if kv != nil {
@@ -114,7 +115,7 @@ func (d *Dict) Get(key string) interface{} {
 	return nil
 }
 
-// GetBytes get data from key
+// GetBytes get data from key.
 func (d *Dict) GetBytes(key []byte) interface{} {
 	kv := getArgs(d.D, gotils.B2S(key))
 	if kv != nil {
@@ -124,60 +125,59 @@ func (d *Dict) GetBytes(key []byte) interface{} {
 	return nil
 }
 
-// Set set new key
+// Set set new key.
 func (d *Dict) Set(key string, value interface{}) {
 	d.D = setArgs(d.D, key, value)
 }
 
-// SetBytes set new key
+// SetBytes set new key.
 func (d *Dict) SetBytes(key []byte, value interface{}) {
 	d.D = setArgs(d.D, gotils.B2S(key), value)
 }
 
-// Del delete key
+// Del delete key.
 func (d *Dict) Del(key string) {
 	d.D = delArgs(d.D, key)
 }
 
-// DelBytes delete key
+// DelBytes delete key.
 func (d *Dict) DelBytes(key []byte) {
 	d.D = delArgs(d.D, gotils.B2S(key))
 }
 
-// Has check if key exists
+// Has check if key exists.
 func (d *Dict) Has(key string) bool {
 	return hasArgs(d.D, key)
 }
 
-// HasBytes check if key exists
+// HasBytes check if key exists.
 func (d *Dict) HasBytes(key []byte) bool {
 	return hasArgs(d.D, gotils.B2S(key))
 }
 
-// Map convert to map
+// Map convert to map.
 func (d *Dict) Map(dst DictMap) {
 	for _, kv := range d.D {
-		switch kv.Value.(type) {
-		case *Dict:
+		sd, ok := kv.Value.(*Dict)
+		if ok {
 			subDst := make(DictMap)
-			kv.Value.(*Dict).Map(subDst)
+			sd.Map(subDst)
 			dst[gotils.B2S(kv.Key)] = subDst
-		default:
+		} else {
 			dst[gotils.B2S(kv.Key)] = kv.Value
 		}
 	}
 }
 
-// Parse convert map to Dict
+// Parse convert map to Dict.
 func (d *Dict) Parse(src DictMap) {
 	for k, v := range src {
-		switch v.(type) {
-		case map[string]interface{}:
+		sv, ok := v.(map[string]interface{})
+		if ok {
 			subDict := new(Dict)
-			subDict.Parse(v.(map[string]interface{}))
-
+			subDict.Parse(sv)
 			d.Set(k, subDict)
-		default:
+		} else {
 			d.Set(k, v)
 		}
 	}

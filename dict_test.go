@@ -35,10 +35,10 @@ func Test_allocKV(t *testing.T) {
 	if len(d.D) == len(newD) {
 		t.Error("allocKV() it is not created a new entry")
 	}
+
 	if kv == nil {
 		t.Error("allocKV() it returns a nil KV pointer")
 	}
-
 }
 
 func Test_appendArgs(t *testing.T) {
@@ -80,10 +80,9 @@ func Test_swap(t *testing.T) {
 }
 
 func TestDict_Get(t *testing.T) {
-	d := AcquireDict()
-	k := "key"
-	v := "value"
+	const k, v = "key", "value"
 
+	d := AcquireDict()
 	d.Set(k, v)
 
 	val := d.Get(k)
@@ -93,9 +92,10 @@ func TestDict_Get(t *testing.T) {
 }
 
 func TestDict_GetBytes(t *testing.T) {
+	const v = "value"
+
 	d := AcquireDict()
 	k := []byte("key")
-	v := "value"
 
 	d.SetBytes(k, v)
 
@@ -106,10 +106,9 @@ func TestDict_GetBytes(t *testing.T) {
 }
 
 func TestDict_Set(t *testing.T) {
-	d := AcquireDict()
-	k := "key"
-	v := "value"
+	const k, v = "key", "value"
 
+	d := AcquireDict()
 	d.Set(k, v)
 
 	if !d.Has(k) {
@@ -118,9 +117,10 @@ func TestDict_Set(t *testing.T) {
 }
 
 func TestDict_SetBytes(t *testing.T) {
+	const v = "value"
+
 	d := AcquireDict()
 	k := []byte("key")
-	v := "value"
 
 	d.SetBytes(k, v)
 
@@ -130,10 +130,9 @@ func TestDict_SetBytes(t *testing.T) {
 }
 
 func TestDict_Del(t *testing.T) {
-	d := AcquireDict()
-	k := "key"
-	v := "value"
+	const k, v = "key", "value"
 
+	d := AcquireDict()
 	d.Set(k, v)
 	d.Del(k)
 
@@ -143,9 +142,10 @@ func TestDict_Del(t *testing.T) {
 }
 
 func TestDict_DelBytes(t *testing.T) {
+	const v = "value"
+
 	d := AcquireDict()
 	k := []byte("key")
-	v := "value"
 
 	d.SetBytes(k, v)
 	d.DelBytes(k)
@@ -156,10 +156,9 @@ func TestDict_DelBytes(t *testing.T) {
 }
 
 func TestDict_Has(t *testing.T) {
-	d := AcquireDict()
-	k := "key"
-	v := "value"
+	const k, v = "key", "value"
 
+	d := AcquireDict()
 	d.Set(k, v)
 
 	if got := d.Has(k); !got {
@@ -180,12 +179,12 @@ func TestDict_HasBytes(t *testing.T) {
 }
 
 func TestDict_Map(t *testing.T) {
-	d := AcquireDict()
-	k := "key"
-	v := "value"
+	const k, v = "key", "value"
 
-	d.Set(k, v)
 	m := make(map[string]interface{})
+
+	d := AcquireDict()
+	d.Set(k, v)
 	d.Map(m)
 
 	if mv, ok := m[k]; !ok {
@@ -215,6 +214,7 @@ func Benchmark_DictPool(b *testing.B) {
 	foo := "DictPool"
 
 	b.ResetTimer()
+
 	for i := 0; i <= b.N; i++ {
 		d := AcquireDict()
 		d.Set(foo, 99)
@@ -227,6 +227,7 @@ func Benchmark_DictPoolBytes(b *testing.B) {
 	foo := []byte("DictPool")
 
 	b.ResetTimer()
+
 	for i := 0; i <= b.N; i++ {
 		d := AcquireDict()
 		d.SetBytes(foo, 99)
@@ -242,7 +243,7 @@ func Benchmark_DictMap(b *testing.B) {
 
 	pool := sync.Pool{
 		New: func() interface{} {
-			return dictKV{
+			return &dictKV{
 				data: make(map[string]interface{}),
 			}
 		},
@@ -251,8 +252,9 @@ func Benchmark_DictMap(b *testing.B) {
 	key := "DictPool"
 
 	b.ResetTimer()
+
 	for i := 0; i <= b.N; i++ {
-		d := pool.Get().(dictKV)
+		d := pool.Get().(*dictKV)
 
 		d.data[key] = 99
 
@@ -276,6 +278,7 @@ func Benchmark_Map(b *testing.B) {
 	m := make(DictMap)
 
 	b.ResetTimer()
+
 	for i := 0; i <= b.N; i++ {
 		d1.Map(m)
 	}
@@ -293,6 +296,7 @@ func Benchmark_Parse(b *testing.B) {
 	d := AcquireDict()
 
 	b.ResetTimer()
+
 	for i := 0; i <= b.N; i++ {
 		d.Parse(m)
 	}

@@ -89,10 +89,10 @@ func (d *Dict) Set(key string, value interface{}) {
 		kv.Value = value
 	} else {
 		d.append(key, value)
-	}
 
-	if d.BinarySearch {
-		sort.Sort(d)
+		if d.BinarySearch {
+			sort.Sort(d)
+		}
 	}
 }
 

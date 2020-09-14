@@ -46,10 +46,12 @@ func (d *Dict) indexOf(key string) int {
 	return -1
 }
 
+// Len is the number of elements in the Dict.
 func (d *Dict) Len() int {
 	return len(d.D)
 }
 
+// Swap swaps the elements with indexes i and j.
 func (d *Dict) Swap(i, j int) {
 	iKey, iValue := d.D[i].Key, d.D[i].Value
 	jKey, jValue := d.D[j].Key, d.D[j].Value
@@ -58,6 +60,8 @@ func (d *Dict) Swap(i, j int) {
 	d.D[j].Key, d.D[j].Value = iKey, iValue
 }
 
+// Less reports whether the element with
+// index i should sort before the element with index j.
 func (d *Dict) Less(i, j int) bool {
 	return d.D[i].Key < d.D[j].Key
 }

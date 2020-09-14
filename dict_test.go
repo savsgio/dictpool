@@ -255,12 +255,12 @@ func TestDict_Map(t *testing.T) {
 	}
 }
 
-func isEqual(t *testing.T, d *Dict, dm map[string]interface{}) bool {
+func isEqual(d *Dict, dm map[string]interface{}) bool {
 	for k, v := range dm {
 		val := d.Get(k)
 
 		if sv, ok := v.(map[string]interface{}); ok {
-			return isEqual(t, val.(*Dict), sv)
+			return isEqual(val.(*Dict), sv)
 		}
 
 		if val != v {
@@ -289,7 +289,7 @@ func TestDict_Parse(t *testing.T) {
 	m[k2] = map[string]interface{}{subK: subV}
 	d1.Parse(m)
 
-	if len(m) == 0 || !isEqual(t, d1, m) {
+	if len(m) == 0 || !isEqual(d1, m) {
 		t.Errorf("Dict.Parse() == %v, want %v", d1, d2)
 	}
 }

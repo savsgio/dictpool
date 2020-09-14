@@ -52,7 +52,7 @@ func (z *Dict) DecodeMsg(dc *msgp.Reader) (err error) {
 					}
 					switch msgp.UnsafeString(field) {
 					case "Key":
-						z.D[za0001].Key, err = dc.ReadBytes(z.D[za0001].Key)
+						z.D[za0001].Key, err = dc.ReadString()
 						if err != nil {
 							err = msgp.WrapError(err, "D", za0001, "Key")
 							return
@@ -72,6 +72,12 @@ func (z *Dict) DecodeMsg(dc *msgp.Reader) (err error) {
 					}
 				}
 			}
+		case "BinarySearch":
+			z.BinarySearch, err = dc.ReadBool()
+			if err != nil {
+				err = msgp.WrapError(err, "BinarySearch")
+				return
+			}
 		default:
 			err = dc.Skip()
 			if err != nil {
@@ -85,9 +91,9 @@ func (z *Dict) DecodeMsg(dc *msgp.Reader) (err error) {
 
 // EncodeMsg implements msgp.Encodable
 func (z *Dict) EncodeMsg(en *msgp.Writer) (err error) {
-	// map header, size 1
+	// map header, size 2
 	// write "D"
-	err = en.Append(0x81, 0xa1, 0x44)
+	err = en.Append(0x82, 0xa1, 0x44)
 	if err != nil {
 		return
 	}
@@ -103,7 +109,7 @@ func (z *Dict) EncodeMsg(en *msgp.Writer) (err error) {
 		if err != nil {
 			return
 		}
-		err = en.WriteBytes(z.D[za0001].Key)
+		err = en.WriteString(z.D[za0001].Key)
 		if err != nil {
 			err = msgp.WrapError(err, "D", za0001, "Key")
 			return
@@ -119,21 +125,31 @@ func (z *Dict) EncodeMsg(en *msgp.Writer) (err error) {
 			return
 		}
 	}
+	// write "BinarySearch"
+	err = en.Append(0xac, 0x42, 0x69, 0x6e, 0x61, 0x72, 0x79, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68)
+	if err != nil {
+		return
+	}
+	err = en.WriteBool(z.BinarySearch)
+	if err != nil {
+		err = msgp.WrapError(err, "BinarySearch")
+		return
+	}
 	return
 }
 
 // MarshalMsg implements msgp.Marshaler
 func (z *Dict) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
-	// map header, size 1
+	// map header, size 2
 	// string "D"
-	o = append(o, 0x81, 0xa1, 0x44)
+	o = append(o, 0x82, 0xa1, 0x44)
 	o = msgp.AppendArrayHeader(o, uint32(len(z.D)))
 	for za0001 := range z.D {
 		// map header, size 2
 		// string "Key"
 		o = append(o, 0x82, 0xa3, 0x4b, 0x65, 0x79)
-		o = msgp.AppendBytes(o, z.D[za0001].Key)
+		o = msgp.AppendString(o, z.D[za0001].Key)
 		// string "Value"
 		o = append(o, 0xa5, 0x56, 0x61, 0x6c, 0x75, 0x65)
 		o, err = msgp.AppendIntf(o, z.D[za0001].Value)
@@ -142,6 +158,9 @@ func (z *Dict) MarshalMsg(b []byte) (o []byte, err error) {
 			return
 		}
 	}
+	// string "BinarySearch"
+	o = append(o, 0xac, 0x42, 0x69, 0x6e, 0x61, 0x72, 0x79, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68)
+	o = msgp.AppendBool(o, z.BinarySearch)
 	return
 }
 
@@ -191,7 +210,7 @@ func (z *Dict) UnmarshalMsg(bts []byte) (o []byte, err error) {
 					}
 					switch msgp.UnsafeString(field) {
 					case "Key":
-						z.D[za0001].Key, bts, err = msgp.ReadBytesBytes(bts, z.D[za0001].Key)
+						z.D[za0001].Key, bts, err = msgp.ReadStringBytes(bts)
 						if err != nil {
 							err = msgp.WrapError(err, "D", za0001, "Key")
 							return
@@ -211,6 +230,12 @@ func (z *Dict) UnmarshalMsg(bts []byte) (o []byte, err error) {
 					}
 				}
 			}
+		case "BinarySearch":
+			z.BinarySearch, bts, err = msgp.ReadBoolBytes(bts)
+			if err != nil {
+				err = msgp.WrapError(err, "BinarySearch")
+				return
+			}
 		default:
 			bts, err = msgp.Skip(bts)
 			if err != nil {
@@ -227,8 +252,9 @@ func (z *Dict) UnmarshalMsg(bts []byte) (o []byte, err error) {
 func (z *Dict) Msgsize() (s int) {
 	s = 1 + 2 + msgp.ArrayHeaderSize
 	for za0001 := range z.D {
-		s += 1 + 4 + msgp.BytesPrefixSize + len(z.D[za0001].Key) + 6 + msgp.GuessSize(z.D[za0001].Value)
+		s += 1 + 4 + msgp.StringPrefixSize + len(z.D[za0001].Key) + 6 + msgp.GuessSize(z.D[za0001].Value)
 	}
+	s += 13 + msgp.BoolSize
 	return
 }
 
@@ -369,7 +395,7 @@ func (z *KV) DecodeMsg(dc *msgp.Reader) (err error) {
 		}
 		switch msgp.UnsafeString(field) {
 		case "Key":
-			z.Key, err = dc.ReadBytes(z.Key)
+			z.Key, err = dc.ReadString()
 			if err != nil {
 				err = msgp.WrapError(err, "Key")
 				return
@@ -392,14 +418,14 @@ func (z *KV) DecodeMsg(dc *msgp.Reader) (err error) {
 }
 
 // EncodeMsg implements msgp.Encodable
-func (z *KV) EncodeMsg(en *msgp.Writer) (err error) {
+func (z KV) EncodeMsg(en *msgp.Writer) (err error) {
 	// map header, size 2
 	// write "Key"
 	err = en.Append(0x82, 0xa3, 0x4b, 0x65, 0x79)
 	if err != nil {
 		return
 	}
-	err = en.WriteBytes(z.Key)
+	err = en.WriteString(z.Key)
 	if err != nil {
 		err = msgp.WrapError(err, "Key")
 		return
@@ -418,12 +444,12 @@ func (z *KV) EncodeMsg(en *msgp.Writer) (err error) {
 }
 
 // MarshalMsg implements msgp.Marshaler
-func (z *KV) MarshalMsg(b []byte) (o []byte, err error) {
+func (z KV) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
 	// map header, size 2
 	// string "Key"
 	o = append(o, 0x82, 0xa3, 0x4b, 0x65, 0x79)
-	o = msgp.AppendBytes(o, z.Key)
+	o = msgp.AppendString(o, z.Key)
 	// string "Value"
 	o = append(o, 0xa5, 0x56, 0x61, 0x6c, 0x75, 0x65)
 	o, err = msgp.AppendIntf(o, z.Value)
@@ -453,7 +479,7 @@ func (z *KV) UnmarshalMsg(bts []byte) (o []byte, err error) {
 		}
 		switch msgp.UnsafeString(field) {
 		case "Key":
-			z.Key, bts, err = msgp.ReadBytesBytes(bts, z.Key)
+			z.Key, bts, err = msgp.ReadStringBytes(bts)
 			if err != nil {
 				err = msgp.WrapError(err, "Key")
 				return
@@ -477,7 +503,7 @@ func (z *KV) UnmarshalMsg(bts []byte) (o []byte, err error) {
 }
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
-func (z *KV) Msgsize() (s int) {
-	s = 1 + 4 + msgp.BytesPrefixSize + len(z.Key) + 6 + msgp.GuessSize(z.Value)
+func (z KV) Msgsize() (s int) {
+	s = 1 + 4 + msgp.StringPrefixSize + len(z.Key) + 6 + msgp.GuessSize(z.Value)
 	return
 }

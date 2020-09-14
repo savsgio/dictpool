@@ -1,115 +1,72 @@
 package dictpool
 
 import (
-	"sync"
+	"sort"
 
 	"github.com/savsgio/gotils"
 )
 
-var defaultPool = sync.Pool{
-	New: func() interface{} {
-		return new(Dict)
-	},
-}
+func (d *Dict) allocKV() *KV {
+	n := len(d.D)
 
-// AcquireDict acquire new dict.
-func AcquireDict() *Dict {
-	return defaultPool.Get().(*Dict)
-}
-
-// ReleaseDict release dict.
-func ReleaseDict(d *Dict) {
-	d.Reset()
-	defaultPool.Put(d)
-}
-
-// Reset reset dict.
-func (d *Dict) Reset() {
-	d.D = d.D[:0]
-}
-
-func allocKV(data []KV) ([]KV, *KV) {
-	n := len(data)
-
-	if cap(data) > n {
-		data = data[:n+1]
+	if cap(d.D) > n {
+		d.D = d.D[:n+1]
 	} else {
-		data = append(data, KV{})
+		d.D = append(d.D, KV{})
 	}
 
-	return data, &data[n]
+	return &d.D[n]
 }
 
-func appendArgs(data []KV, key string, value interface{}) []KV {
-	data, kv := allocKV(data)
-
-	kv.Key = append(kv.Key[:0], key...)
+func (d *Dict) append(key string, value interface{}) {
+	kv := d.allocKV()
+	kv.Key = key
 	kv.Value = value
-
-	return data
 }
 
-func swap(data []KV, i, j int) []KV {
-	data[i], data[j] = data[j], data[i]
+func (d *Dict) indexOf(key string) int {
+	n := len(d.D)
 
-	return data
-}
+	if d.BinarySearch {
+		idx := sort.Search(n, func(i int) bool {
+			return key <= d.D[i].Key
+		})
 
-func getArgs(data []KV, key string) *KV {
-	n := len(data)
-	for i := 0; i < n; i++ {
-		kv := &data[i]
-		if key == gotils.B2S(kv.Key) {
-			return kv
+		if idx < n && d.D[idx].Key == key {
+			return idx
 		}
-	}
-
-	return nil
-}
-
-func setArgs(data []KV, key string, value interface{}) []KV {
-	kv := getArgs(data, key)
-	if kv != nil {
-		kv.Value = value
-		return data
-	}
-
-	return appendArgs(data, key, value)
-}
-
-func delArgs(data []KV, key string) []KV {
-	for i, n := 0, len(data); i < n; i++ {
-		kv := &data[i]
-		if key == gotils.B2S(kv.Key) {
-			n--
-			if i != n {
-				swap(data, i, n)
-				i--
+	} else {
+		for i := 0; i < n; i++ {
+			if d.D[i].Key == key {
+				return i
 			}
-
-			data = data[:n] // Remove last position
 		}
 	}
 
-	return data
+	return -1
 }
 
-func hasArgs(data []KV, key string) bool {
-	for i, n := 0, len(data); i < n; i++ {
-		kv := &data[i]
-		if key == gotils.B2S(kv.Key) {
-			return true
-		}
-	}
+func (d *Dict) Len() int {
+	return len(d.D)
+}
 
-	return false
+func (d *Dict) Swap(i, j int) {
+	iKey, iValue := d.D[i].Key, d.D[i].Value
+	jKey, jValue := d.D[j].Key, d.D[j].Value
+
+	d.D[i].Key, d.D[i].Value = jKey, jValue
+	d.D[j].Key, d.D[j].Value = iKey, iValue
+}
+
+func (d *Dict) Less(i, j int) bool {
+	return d.D[i].Key < d.D[j].Key
 }
 
 // Get get data from key.
 func (d *Dict) Get(key string) interface{} {
-	kv := getArgs(d.D, key)
-	if kv != nil {
-		return kv.Value
+	idx := d.indexOf(key)
+	if idx > -1 {
+		return d.D[idx].Value
 	}
 
 	return nil
@@ -117,68 +74,87 @@ func (d *Dict) Get(key string) interface{} {
 
 // GetBytes get data from key.
 func (d *Dict) GetBytes(key []byte) interface{} {
-	kv := getArgs(d.D, gotils.B2S(key))
-	if kv != nil {
-		return kv.Value
-	}
-
-	return nil
+	return d.Get(gotils.B2S(key))
 }
 
 // Set set new key.
 func (d *Dict) Set(key string, value interface{}) {
-	d.D = setArgs(d.D, key, value)
+	idx := d.indexOf(key)
+	if idx > -1 {
+		kv := &d.D[idx]
+		kv.Value = value
+	} else {
+		d.append(key, value)
+	}
+
+	if d.BinarySearch {
+		sort.Sort(d)
+	}
 }
 
 // SetBytes set new key.
 func (d *Dict) SetBytes(key []byte, value interface{}) {
-	d.D = setArgs(d.D, gotils.B2S(key), value)
+	d.Set(gotils.B2S(key), value)
 }
 
 // Del delete key.
 func (d *Dict) Del(key string) {
-	d.D = delArgs(d.D, key)
+	idx := d.indexOf(key)
+	if idx > -1 {
+		n := len(d.D) - 1
+		d.Swap(idx, n)
+		d.D = d.D[:n] // Remove last position
+	}
 }
 
 // DelBytes delete key.
 func (d *Dict) DelBytes(key []byte) {
-	d.D = delArgs(d.D, gotils.B2S(key))
+	d.Del(gotils.B2S(key))
 }
 
 // Has check if key exists.
 func (d *Dict) Has(key string) bool {
-	return hasArgs(d.D, key)
+	return d.indexOf(key) > -1
 }
 
 // HasBytes check if key exists.
 func (d *Dict) HasBytes(key []byte) bool {
-	return hasArgs(d.D, gotils.B2S(key))
+	return d.Has(gotils.B2S(key))
+}
+
+// Reset reset dict.
+func (d *Dict) Reset() {
+	d.D = d.D[:0]
 }
 
 // Map convert to map.
 func (d *Dict) Map(dst DictMap) {
-	for _, kv := range d.D {
+	for i := range d.D {
+		kv := &d.D[i]
+
 		sd, ok := kv.Value.(*Dict)
 		if ok {
 			subDst := make(DictMap)
 			sd.Map(subDst)
-			dst[gotils.B2S(kv.Key)] = subDst
+			dst[kv.Key] = subDst
 		} else {
-			dst[gotils.B2S(kv.Key)] = kv.Value
+			dst[kv.Key] = kv.Value
 		}
 	}
 }
 
 // Parse convert map to Dict.
 func (d *Dict) Parse(src DictMap) {
+	d.Reset()
+
 	for k, v := range src {
 		sv, ok := v.(map[string]interface{})
 		if ok {
 			subDict := new(Dict)
 			subDict.Parse(sv)
-			d.Set(k, subDict)
+			d.append(k, subDict)
 		} else {
-			d.Set(k, v)
+			d.append(k, v)
 		}
 	}
 }

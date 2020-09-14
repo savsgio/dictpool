@@ -255,6 +255,22 @@ func TestDict_Map(t *testing.T) {
 	}
 }
 
+func isEqual(t *testing.T, d *Dict, dm map[string]interface{}) bool {
+	for k, v := range dm {
+		val := d.Get(k)
+
+		if sv, ok := v.(map[string]interface{}); ok {
+			return isEqual(t, val.(*Dict), sv)
+		}
+
+		if val != v {
+			return false
+		}
+	}
+
+	return true
+}
+
 func TestDict_Parse(t *testing.T) {
 	const k, v, k2 = "key", "value", "subkey"
 
@@ -273,7 +289,7 @@ func TestDict_Parse(t *testing.T) {
 	m[k2] = map[string]interface{}{subK: subV}
 	d1.Parse(m)
 
-	if !reflect.DeepEqual(d1, d2) {
+	if len(m) == 0 || !isEqual(t, d1, m) {
 		t.Errorf("Dict.Parse() == %v, want %v", d1, d2)
 	}
 }

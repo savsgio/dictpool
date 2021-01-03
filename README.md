@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/savsgio/dictpool)](https://goreportcard.com/report/github.com/savsgio/dictpool)
 [![GoDev](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/savsgio/dictpool)
 
-Memory store like `map[string]interface{}` with better performance.
+Memory store like `map[string]interface{}` with better performance when reuse memory.
 
 **Very useful when reuse memory (_sync.Pool_) to avoid extra allocations and increase the performance**.
 

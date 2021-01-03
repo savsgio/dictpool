@@ -40,10 +40,6 @@ func TestDict_append(t *testing.T) {
 	}
 }
 
-func TestDict_indexOf(t *testing.T) {
-
-}
-
 func TestDict_Len(t *testing.T) {
 	d := AcquireDict()
 	d.Set("key", "value")
@@ -313,6 +309,8 @@ func Benchmark_Set(b *testing.B) {
 }
 
 func benchmarkGet(b *testing.B, d *Dict, items int) {
+	b.Helper()
+
 	key := "hola"
 
 	for i := 0; i < items; i++ {

@@ -1,7 +1,7 @@
 github.com/philhofer/fwd v1.1.1 h1:GdGcTjf5RNAxwS4QLsiMzJYj5KEvPJD3Abr261yRQXQ=
 github.com/philhofer/fwd v1.1.1/go.mod h1:gk3iGcWd9+svBvR0sR+KPcfE+RNWozjowpeBVG3ZVNU=
-github.com/savsgio/gotils v0.0.0-20200909101946-939aa3fc74fb h1:XPJCVf85HPE2jMVEQ7QWrazaZo1lc94GbUWaQ8Yv5sM=
-github.com/savsgio/gotils v0.0.0-20200909101946-939aa3fc74fb/go.mod h1:TWNAOTaVzGOXq8RbEvHnhzA/A2sLZzgn0m6URjnukY8=
+github.com/savsgio/gotils v0.0.0-20210104112019-96a5e1e9898f h1:MlVk9SWHScKX//xsHudKurgtyVOmD06TLYKnuTPNK4g=
+github.com/savsgio/gotils v0.0.0-20210104112019-96a5e1e9898f/go.mod h1:TWNAOTaVzGOXq8RbEvHnhzA/A2sLZzgn0m6URjnukY8=
 github.com/tinylib/msgp v1.1.5 h1:2gXmtWueD2HefZHQe1QOy9HVzmFrLOVvsXwXBQ0ayy0=
 github.com/tinylib/msgp v1.1.5/go.mod h1:eQsjooMTnV42mHu917E26IogZ2930nFyBQdofk10Udg=
 github.com/ttacon/chalk v0.0.0-20160626202418-22c06c80ed31/go.mod h1:onvgF043R+lC5RZ8IT9rBXDaEDnpnw/Cl+HFiw+v/7Q=

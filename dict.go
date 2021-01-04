@@ -3,7 +3,7 @@ package dictpool
 import (
 	"sort"
 
-	"github.com/savsgio/gotils"
+	"github.com/savsgio/gotils/strconv"
 )
 
 func (d *Dict) allocKV() *KV {
@@ -78,7 +78,7 @@ func (d *Dict) Get(key string) interface{} {
 
 // GetBytes get data from key.
 func (d *Dict) GetBytes(key []byte) interface{} {
-	return d.Get(gotils.B2S(key))
+	return d.Get(strconv.B2S(key))
 }
 
 // Set set new key.
@@ -98,7 +98,7 @@ func (d *Dict) Set(key string, value interface{}) {
 
 // SetBytes set new key.
 func (d *Dict) SetBytes(key []byte, value interface{}) {
-	d.Set(gotils.B2S(key), value)
+	d.Set(strconv.B2S(key), value)
 }
 
 // Del delete key.
@@ -113,7 +113,7 @@ func (d *Dict) Del(key string) {
 
 // DelBytes delete key.
 func (d *Dict) DelBytes(key []byte) {
-	d.Del(gotils.B2S(key))
+	d.Del(strconv.B2S(key))
 }
 
 // Has check if key exists.
@@ -123,7 +123,7 @@ func (d *Dict) Has(key string) bool {
 
 // HasBytes check if key exists.
 func (d *Dict) HasBytes(key []byte) bool {
-	return d.Has(gotils.B2S(key))
+	return d.Has(strconv.B2S(key))
 }
 
 // Reset reset dict.

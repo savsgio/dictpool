@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/savsgio/gotils"
+	"github.com/savsgio/gotils/bytes"
 )
 
 func TestDict_allocKV(t *testing.T) {
@@ -298,7 +298,7 @@ func Benchmark_Set(b *testing.B) {
 	total := b.N
 
 	for i := 0; i < total; i++ {
-		values = append(values, string(gotils.RandBytes(make([]byte, 10))))
+		values = append(values, string(bytes.Rand(make([]byte, 10))))
 	}
 
 	b.ResetTimer()
@@ -314,7 +314,7 @@ func benchmarkGet(b *testing.B, d *Dict, items int) {
 	key := "hola"
 
 	for i := 0; i < items; i++ {
-		d.SetBytes(gotils.RandBytes(make([]byte, 10)), i)
+		d.SetBytes(bytes.Rand(make([]byte, 10)), i)
 
 		if i == items-(items/3) {
 			d.Set(key, "Hola")

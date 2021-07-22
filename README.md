@@ -1,6 +1,6 @@
 # dictpool
 
-[![Build Status](https://travis-ci.org/savsgio/dictpool.svg?branch=master)](https://travis-ci.org/savsgio/dictpool)
+[![Test status](https://github.com/savsgio/dictpool/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/savsgio/dictpool/actions?workflow=test)
 [![Go Report Card](https://goreportcard.com/badge/github.com/savsgio/dictpool)](https://goreportcard.com/report/github.com/savsgio/dictpool)
 [![GoDev](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/savsgio/dictpool)
 

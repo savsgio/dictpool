@@ -159,7 +159,7 @@ func TestDict_SetBytes(t *testing.T) {
 	d.SetBytes(k, newVal)
 
 	val := d.GetBytes(k)
-	if string(val.([]byte)) != string(newVal) {
+	if string(val.([]byte)) != string(newVal) { // nolint:forcetypeassert
 		t.Errorf("Dict.Set() has not been updated the value")
 	}
 }
@@ -256,7 +256,7 @@ func isEqual(d *Dict, dm map[string]interface{}) bool {
 		val := d.Get(k)
 
 		if sv, ok := v.(map[string]interface{}); ok {
-			return isEqual(val.(*Dict), sv)
+			return isEqual(val.(*Dict), sv) // nolint:forcetypeassert
 		}
 
 		if val != v {

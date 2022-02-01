@@ -11,11 +11,11 @@ Memory store like `map[string]interface{}` with better performance when reuse me
 ## Benchmarks:
 
 ```
-BenchmarkDict-4         	34935307	        35.2 ns/op	       0 B/op	       0 allocs/op
-BenchmarkStdMap-4       	20123041	        59.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkDict-12    	100000000	        12.08 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStdMap-12    	71028591	        21.23 ns/op	       0 B/op	       0 allocs/op
 ```
 
-_Benchmark with Go 1.15_
+_Benchmark with Go 1.17_
 
 ## Example:
 

@@ -2,6 +2,7 @@ package dictpool
 
 import (
 	"reflect"
+	"sync"
 	"testing"
 
 	"github.com/savsgio/gotils/bytes"
@@ -183,6 +184,9 @@ func TestDict_DelBytes(t *testing.T) {
 	k := []byte("key")
 
 	d.SetBytes(k, v)
+	d.Set("dsad12", v)
+	d.Set("dsad123124", v)
+	d.Set("dsad234234545", v)
 	d.DelBytes(k)
 
 	if d.HasBytes(k) {
@@ -290,41 +294,32 @@ func TestDict_Parse(t *testing.T) {
 	}
 }
 
-func Benchmark_Set(b *testing.B) {
-	d := AcquireDict()
+func genKeys(tb testing.TB, size int) []string {
+	tb.Helper()
 
-	values := []string{}
+	keys := []string{}
 
-	total := b.N
-
-	for i := 0; i < total; i++ {
-		values = append(values, string(bytes.Rand(make([]byte, 10))))
+	for i := 0; i < size; i++ {
+		keys = append(keys, string(bytes.Rand(make([]byte, 10))))
 	}
 
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
-		d.Set(values[0], i)
-	}
+	return keys
 }
 
 func benchmarkGet(b *testing.B, d *Dict, items int) {
 	b.Helper()
 
-	key := "hola"
+	keys := genKeys(b, items)
+	want := 12345 % items
 
-	for i := 0; i < items; i++ {
-		d.SetBytes(bytes.Rand(make([]byte, 10)), i)
-
-		if i == items-(items/3) {
-			d.Set(key, "Hola")
-		}
+	for i := range keys {
+		d.Set(keys[i], i)
 	}
 
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		d.Get(key)
+		d.Get(keys[want])
 	}
 }
 
@@ -352,6 +347,85 @@ func Benchmark_GetBinaryBigHeap(b *testing.B) {
 	d.BinarySearch = true
 
 	benchmarkGet(b, d, 1000)
+}
+
+func benchmarkSet(b *testing.B, d *Dict, items int) {
+	b.Helper()
+
+	keys := genKeys(b, items)
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		d.Set(keys[i%items], i)
+	}
+}
+
+func Benchmark_Set(b *testing.B) {
+	d := AcquireDict()
+
+	benchmarkSet(b, d, 10)
+}
+
+func Benchmark_SetBinary(b *testing.B) {
+	d := AcquireDict()
+	d.BinarySearch = true
+
+	benchmarkSet(b, d, 10)
+}
+
+func Benchmark_SetBigHeap(b *testing.B) {
+	d := AcquireDict()
+
+	benchmarkSet(b, d, 1000)
+}
+
+func Benchmark_SetBinaryBigHeap(b *testing.B) {
+	d := AcquireDict()
+	d.BinarySearch = true
+
+	benchmarkSet(b, d, 1000)
+}
+
+func benchmarkDel(b *testing.B, d *Dict, items int) {
+	b.Helper()
+
+	keys := genKeys(b, items)
+	for i := range keys {
+		d.Set(keys[i], i)
+	}
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		d.Del(keys[i%items])
+	}
+}
+
+func Benchmark_Del(b *testing.B) {
+	d := AcquireDict()
+
+	benchmarkDel(b, d, 10)
+}
+
+func Benchmark_DelBinary(b *testing.B) {
+	d := AcquireDict()
+	d.BinarySearch = true
+
+	benchmarkDel(b, d, 10)
+}
+
+func Benchmark_DelBigHeap(b *testing.B) {
+	d := AcquireDict()
+
+	benchmarkDel(b, d, 1000)
+}
+
+func Benchmark_DelBinaryBigHeap(b *testing.B) {
+	d := AcquireDict()
+	d.BinarySearch = true
+
+	benchmarkDel(b, d, 1000)
 }
 
 func Benchmark_Map(b *testing.B) {
@@ -391,48 +465,64 @@ func Benchmark_Parse(b *testing.B) {
 }
 
 func BenchmarkDict(b *testing.B) {
-	keys := []string{"foobar", "baz", "aaa", "bsdfs"}
+	keys := genKeys(b, 100)
 
-	b.RunParallel(func(pb *testing.PB) {
-		u := AcquireDict()
-		// u.BinarySearch = true
-		var v interface{} = u
+	u := AcquireDict()
+	// u.BinarySearch = true
 
-		for pb.Next() {
-			for _, key := range keys {
-				u.Set(key, v)
-			}
-			for _, key := range keys {
-				vv := u.Get(key)
-				if _, ok := vv.(*Dict); !ok {
-					b.Fatalf("unexpected value %v for key %q", vv, key)
-				}
-			}
-			u.Reset()
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		for j, key := range keys {
+			u.Set(key, j)
 		}
-	})
+
+		for _, key := range keys {
+			_ = u.Get(key)
+		}
+
+		u.Reset()
+	}
 }
 
 func BenchmarkStdMap(b *testing.B) {
-	keys := []string{"foobar", "baz", "aaa", "bsdfs"}
+	keys := genKeys(b, 100)
+	u := make(map[string]interface{})
 
-	b.RunParallel(func(pb *testing.PB) {
-		u := make(map[string]interface{})
-		var v interface{} = u
-		for pb.Next() {
-			for _, key := range keys {
-				u[key] = v
-			}
-			for _, key := range keys {
-				vv := u[key]
-				if _, ok := vv.(map[string]interface{}); !ok {
-					b.Fatalf("unexpected value %v for key %q", vv, key)
-				}
-			}
+	b.ResetTimer()
 
-			for k := range u {
-				delete(u, k)
-			}
+	for i := 0; i < b.N; i++ {
+		for j, key := range keys {
+			u[key] = j
 		}
-	})
+
+		for _, key := range keys {
+			_ = u[key]
+		}
+
+		u = make(map[string]interface{})
+	}
+}
+
+func BenchmarkSyncMap(b *testing.B) {
+	keys := genKeys(b, 100)
+	u := new(sync.Map)
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		for j, key := range keys {
+			u.Store(key, j)
+		}
+
+		for _, key := range keys {
+			_, _ = u.Load(key)
+		}
+
+		u.Range(func(key, _ interface{}) bool {
+			u.Delete(key)
+
+			return true
+		})
+	}
 }

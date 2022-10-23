@@ -4,7 +4,7 @@ import "sync"
 
 var defaultPool = sync.Pool{
 	New: func() interface{} {
-		return new(Dict)
+		return New()
 	},
 }
 

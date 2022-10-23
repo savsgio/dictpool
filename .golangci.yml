@@ -11,3 +11,14 @@ linters:
     - nolintlint
     - ifshort
     - varnamelen
+
+    # Deprecated
+    - maligned
+    - scopelint
+    - golint
+    - interfacer
+    - structcheck
+    - varcheck
+    - nosnakecase
+    - ifshort
+    - deadcode
